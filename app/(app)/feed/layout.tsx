@@ -5,5 +5,5 @@ export default function FeedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="max-w-360 w-full mx-auto">{children}</div>;
+  return <div className="max-w-6xl w-full mx-auto">{children}</div>;
 }
