@@ -1,3 +1,5 @@
+"use client";
+
 import { Home, LucideIcon, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -29,7 +31,7 @@ export default function Drawer({ children }: { children: ReactNode }) {
   return (
     <div className="drawer lg:drawer-open">
       <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
-      <div className="drawer-content flex flex-col p-4">
+      <div className="drawer-content flex flex-col">
         {/* Page content here */}
         <label htmlFor="my-drawer-3" className="btn drawer-button lg:hidden">
           Open drawer

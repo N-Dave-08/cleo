@@ -1,5 +1,6 @@
+"use client";
+
 import Image from "next/image";
-import { PostData } from "../_types/post";
 import {
   Bookmark,
   Forward,
@@ -8,6 +9,8 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { PostData } from "@/data/posts";
 
 interface ActionButton {
   name: string;
@@ -43,7 +46,7 @@ export default function Post({
   date,
 }: PostData) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isTruncated, setIsTruncated] = useState(true); // Default to true for initial check
+  const [isTruncated, setIsTruncated] = useState(true);
   const textRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
@@ -62,7 +65,11 @@ export default function Post({
   }, [content, isExpanded]);
 
   return (
-    <div className="flex gap-3 p-4  max-w-2xl" key={id}>
+    <Link
+      href={`/post/${id}`}
+      className="flex gap-2 p-4 hover:bg-base-content/5 cursor-pointer max-w-2xl"
+      key={id}
+    >
       {/* Left Column: Avatar */}
       <div className="shrink-0">
         <div className="avatar">
@@ -87,10 +94,9 @@ export default function Post({
           </div>
         </div>
 
-        {/* Post Body Text (Optional - added for layout context) */}
         {/* 
-         If NOT expanded: We use flex to keep the button on the same line.
-         If EXPANDED: We use block to let text flow naturally downwards.
+         If NOT expanded: use flex to keep the button on the same line
+         If EXPANDED:  use block to let text flow naturally downwards
       */}
         <div
           className={` text-sm ${!isExpanded ? "flex items-center gap-2" : ""}`}
@@ -108,7 +114,7 @@ export default function Post({
           {isTruncated && !isExpanded && (
             <button
               onClick={(e) => {
-                e.stopPropagation(); // Prevent the <p> tag's onClick from firing twice
+                e.stopPropagation();
                 setIsExpanded(true);
               }}
               className=" font-semibold shrink-0 hover:link"
@@ -127,7 +133,7 @@ export default function Post({
                 src={image}
                 width={1200}
                 height={675}
-                className="w-full h-auto block object-cover hover:opacity-95 transition-opacity cursor-pointer"
+                className="w-full h-auto block object-cover "
               />
             </div>
           </div>
@@ -150,6 +156,6 @@ export default function Post({
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
