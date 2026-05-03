@@ -14,7 +14,7 @@ const sidebarItems: SidebarItem[] = [
   {
     icon: Home,
     name: "Home",
-    link: "/feed",
+    link: "/home",
   },
   {
     icon: Settings,

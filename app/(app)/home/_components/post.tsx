@@ -1,19 +1,33 @@
 import Image from "next/image";
 import { PostData } from "../_types/post";
-import { Bookmark, Forward, Heart, MessageCircle } from "lucide-react";
+import {
+  Bookmark,
+  Forward,
+  Heart,
+  LucideIcon,
+  MessageCircle,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
-interface ActionButton {}
+interface ActionButton {
+  name: string;
+  count: number;
+  icon: LucideIcon;
+}
 
-const actionButtons = [
+const actionButtons: ActionButton[] = [
   {
+    name: "like",
     count: 487,
     icon: Heart,
   },
   {
+    name: "comment",
     count: 12,
     icon: MessageCircle,
   },
   {
+    name: "bookmark",
     count: 90,
     icon: Bookmark,
   },
@@ -28,6 +42,25 @@ export default function Post({
   image,
   date,
 }: PostData) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isTruncated, setIsTruncated] = useState(true); // Default to true for initial check
+  const textRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    const checkTruncation = () => {
+      if (textRef.current && !isExpanded) {
+        // Check if the text is actually wider than its container
+        const hasOverflow =
+          textRef.current.scrollWidth > textRef.current.clientWidth;
+        setIsTruncated(hasOverflow);
+      }
+    };
+
+    checkTruncation();
+    window.addEventListener("resize", checkTruncation);
+    return () => window.removeEventListener("resize", checkTruncation);
+  }, [content, isExpanded]);
+
   return (
     <div className="flex gap-3 p-4  max-w-2xl" key={id}>
       {/* Left Column: Avatar */}
@@ -55,9 +88,35 @@ export default function Post({
         </div>
 
         {/* Post Body Text (Optional - added for layout context) */}
-        <p className="text-base-content text-[15px] leading-normal mb-2">
-          {content}
-        </p>
+        {/* 
+         If NOT expanded: We use flex to keep the button on the same line.
+         If EXPANDED: We use block to let text flow naturally downwards.
+      */}
+        <div
+          className={` text-sm ${!isExpanded ? "flex items-center gap-2" : ""}`}
+        >
+          <p
+            ref={textRef}
+            onClick={() => setIsExpanded((prev) => !prev)}
+            className={`text-base-content  cursor-pointer ${
+              !isExpanded ? "truncate" : "whitespace-pre-wrap"
+            }`}
+          >
+            {content}
+          </p>
+
+          {isTruncated && !isExpanded && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent the <p> tag's onClick from firing twice
+                setIsExpanded(true);
+              }}
+              className=" font-semibold shrink-0 hover:link"
+            >
+              See more
+            </button>
+          )}
+        </div>
 
         {/* Media: Post Image */}
         {image && (
@@ -78,8 +137,8 @@ export default function Post({
         <div className="flex justify-between">
           <div className="flex gap-6">
             {actionButtons.map((button) => (
-              <div className="btn btn-xs btn-ghost">
-                <button.icon key={crypto.randomUUID()} className="h-4 w-4" />
+              <div className="btn btn-xs btn-ghost" key={button.name}>
+                <button.icon className="h-4 w-4" />
                 <span>{button.count}</span>
               </div>
             ))}
