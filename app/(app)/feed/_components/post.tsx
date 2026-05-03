@@ -1,5 +1,23 @@
 import Image from "next/image";
 import { PostData } from "../_types/post";
+import { Bookmark, Forward, Heart, MessageCircle } from "lucide-react";
+
+interface ActionButton {}
+
+const actionButtons = [
+  {
+    count: 487,
+    icon: Heart,
+  },
+  {
+    count: 12,
+    icon: MessageCircle,
+  },
+  {
+    count: 90,
+    icon: Bookmark,
+  },
+];
 
 export default function Post({
   id,
@@ -57,6 +75,21 @@ export default function Post({
         )}
 
         {/* Action Buttons could go here (Reply, Like, etc.) */}
+        <div className="flex justify-between">
+          <div className="flex gap-6">
+            {actionButtons.map((button) => (
+              <div className="btn btn-xs btn-ghost">
+                <button.icon key={crypto.randomUUID()} className="h-4 w-4" />
+                <span>{button.count}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="btn btn-xs btn-ghost">
+            <Forward className="h-4 w-4" />
+            <span>34</span>
+          </div>
+        </div>
       </div>
     </div>
   );
