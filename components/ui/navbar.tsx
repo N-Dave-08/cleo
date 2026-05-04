@@ -29,7 +29,7 @@ export default function Navbar() {
           <Link href={"/login"} className="btn btn-sm">
             Login
           </Link>
-          <Link href={"/register"} className="btn btn-sm btn-ghost">
+          <Link href={"/signup"} className="btn btn-sm btn-ghost">
             Sign up
           </Link>
         </div>

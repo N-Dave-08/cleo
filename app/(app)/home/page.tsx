@@ -24,11 +24,7 @@ export default function HomePage() {
           {/* Right Column: Content Area */}
           <div className="flex-1 min-w-0 flex flex-col gap-1">
             {/* Header: Name, Handle, and Time */}
-            <PostHeader
-              authorName={post.authorName}
-              authorUsername={post.authorUsername}
-              date={post.date}
-            />
+            <PostHeader authorUsername={post.authorUsername} date={post.date} />
 
             {/* Content */}
             <PostContent content={post.content} />

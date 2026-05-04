@@ -11,7 +11,6 @@ import PostActions from "./post-action";
 export default function Post({
   id,
   authorAvatar,
-  authorName,
   authorUsername,
   content,
   image,
@@ -29,11 +28,7 @@ export default function Post({
       {/* Right Column: Content Area */}
       <div className="flex-1 min-w-0 flex flex-col gap-1">
         {/* Header: Name, Handle, and Time */}
-        <PostHeader
-          authorName={authorName}
-          authorUsername={authorUsername}
-          date={date}
-        />
+        <PostHeader authorUsername={authorUsername} date={date} />
 
         {/* Content */}
         <PostContent content={content} />
