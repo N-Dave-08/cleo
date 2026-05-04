@@ -1,23 +1,45 @@
 "use client";
 
-import Post from "./_components/post";
+import Link from "next/link";
 import { postItems } from "@/data/posts";
+import PostAvatar from "./_components/post-avatar";
+import PostHeader from "./_components/post-header";
+import PostContent from "./_components/post-content";
+import PostImage from "./_components/post-image";
+import PostActions from "./_components/post-action";
 
-export default function FeedPage() {
+export default function HomePage() {
   return (
     <>
       {/* Main Post Container */}
       {postItems.map((post) => (
-        <Post
+        <Link
+          href={`/post/${post.id}`}
+          className="flex gap-2 p-4 hover:bg-base-content/5 cursor-pointer max-w-2xl"
           key={post.id}
-          id={post.id}
-          authorAvatar={post.authorAvatar}
-          authorName={post.authorName}
-          authorUsername={post.authorUsername}
-          content={post.content}
-          image={post.image}
-          date={post.date}
-        />
+        >
+          {/* Left Column: Avatar */}
+          <PostAvatar authorAvatar={post.authorAvatar} />
+
+          {/* Right Column: Content Area */}
+          <div className="flex-1 min-w-0 flex flex-col gap-1">
+            {/* Header: Name, Handle, and Time */}
+            <PostHeader
+              authorName={post.authorName}
+              authorUsername={post.authorUsername}
+              date={post.date}
+            />
+
+            {/* Content */}
+            <PostContent content={post.content} />
+
+            {/* Media: Post Image */}
+            <PostImage image={post.image} />
+
+            {/* Action Buttons */}
+            <PostActions />
+          </div>
+        </Link>
       ))}
     </>
   );
