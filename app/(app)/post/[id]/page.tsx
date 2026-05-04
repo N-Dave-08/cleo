@@ -4,7 +4,6 @@ import PostAvatar from "../../home/_components/post-avatar";
 import PostContent from "../../home/_components/post-content";
 import PostImage from "../../home/_components/post-image";
 import PostActions from "../../home/_components/post-action";
-import PostHeader from "../../home/_components/post-header";
 import { Globe } from "lucide-react";
 
 export default async function PostPage({
