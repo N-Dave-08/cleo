@@ -4,7 +4,6 @@ import PostAvatar from "../../home/_components/post-avatar";
 import PostContent from "../../home/_components/post-content";
 import PostImage from "../../home/_components/post-image";
 import PostActions from "../../home/_components/post-action";
-import PostHeader from "../../home/_components/post-header";
 import { Globe } from "lucide-react";
 
 export default async function PostPage({
@@ -33,14 +32,6 @@ export default async function PostPage({
           </div>
         </div>
       </div>
-      {/* <div className="bg-red-500 flex">
-        <PostAvatar authorAvatar={post.authorAvatar} />
-        <PostHeader
-          authorUsername={post.authorUsername}
-          date={post.date}
-          className="flex-col"
-        />
-      </div> */}
       <PostContent
         content={post.content}
         className="text-sm sm:text-md md:text-lg"
