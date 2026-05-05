@@ -7,6 +7,7 @@ import {
   LucideIcon,
   Settings,
   PanelLeftOpen,
+  Cat,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -41,7 +42,7 @@ export default function Drawer({ children }: { children: ReactNode }) {
 
       <div className="drawer-content flex flex-col">
         {/* Navbar */}
-        <nav className="navbar w-full border border-b border-base-content/5">
+        <nav className="navbar w-full border border-b border-base-content/5 bg-base-100 z-10 sticky top-0">
           <div className="flex-none">
             <label
               htmlFor="my-drawer-4"
@@ -51,12 +52,16 @@ export default function Drawer({ children }: { children: ReactNode }) {
               <PanelLeftOpen className="size-5" />
             </label>
           </div>
-          <div className="flex-1 px-4 font-bold">Navbar Title</div>
+          <div className="flex-1 px-4 font-bold">
+            <div className="flex gap-1">
+              <Cat /> <span>Cleo</span>
+            </div>
+          </div>
         </nav>
 
         {/* Main Page Content */}
         <main className={cn("grow", "flex flex-col items-center")}>
-          <div className="w-full max-w-4xl">{children}</div>
+          <div className="w-full max-w-xl">{children}</div>
         </main>
       </div>
 
@@ -69,7 +74,7 @@ export default function Drawer({ children }: { children: ReactNode }) {
 
         <div className="flex min-h-full flex-col items-start  border-r border-base-content/5 is-drawer-close:w-16 is-drawer-open:w-64 transition-all duration-300">
           {/* Navigation Links */}
-          <ul className="menu w-full grow p-2 gap-1">
+          <ul className="menu w-full grow">
             {sidebarItems.map((item) => {
               const isActive = pathname === item.link;
               return (
@@ -93,7 +98,7 @@ export default function Drawer({ children }: { children: ReactNode }) {
           </ul>
 
           {/* User Profile Dropdown */}
-          <div className="dropdown dropdown-top w-full p-2">
+          <div className="dropdown dropdown-top dropdown-center w-full p-2">
             <div
               tabIndex={0}
               role="button"
