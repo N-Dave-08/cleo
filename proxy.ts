@@ -58,6 +58,19 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
+  /**
+   * PREVENT LOGGED-IN USERS FROM ACCESSING AUTH/PUBLIC PAGES:
+   * If user is logged-in and trying to access auth and public pages,
+   * we intercept the request and bounce them back to the home page.
+   */
+  if (
+    user &&
+    (request.nextUrl.pathname === "/" ||
+      request.nextUrl.pathname.startsWith("/login") ||
+      request.nextUrl.pathname.startsWith("/signup"))
+  ) {
+    return NextResponse.redirect(new URL("/home", request.url));
+  }
   return response;
 }
 
@@ -67,5 +80,5 @@ export async function proxy(request: NextRequest) {
  * For Cleo, we protect the home feed and individual post pages.
  */
 export const config = {
-  matcher: ["/home/:path*", "/post/:path*"],
+  matcher: ["/", "/login", "/signup", "/home/:path*", "/post/:path*"],
 };

@@ -24,7 +24,7 @@ export default async function FeedLayout({
   return (
     <div className="w-full">
       {/* Pass the user object to your Drawer to personalize the UI */}
-      <Drawer>{children}</Drawer>
+      <Drawer user={user}>{children}</Drawer>
     </div>
   );
 }

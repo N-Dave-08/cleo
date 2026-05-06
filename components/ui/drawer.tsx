@@ -14,6 +14,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
+import { User } from "@supabase/supabase-js";
 
 interface SidebarItem {
   name: string;
@@ -34,7 +35,13 @@ const sidebarItems: SidebarItem[] = [
   },
 ];
 
-export default function Drawer({ children }: { children: ReactNode }) {
+export default function Drawer({
+  children,
+  user,
+}: {
+  children: ReactNode;
+  user: User;
+}) {
   const pathname = usePathname();
 
   return (
@@ -126,7 +133,9 @@ export default function Drawer({ children }: { children: ReactNode }) {
 
               {/* Name + icon */}
               <div className="flex flex-1 items-center justify-between overflow-hidden is-drawer-close:hidden">
-                <span className="text-sm truncate">johndoe497</span>
+                <span className="text-sm truncate">
+                  {user.user_metadata.username}
+                </span>
                 <EllipsisVertical className="size-4 opacity-50" />
               </div>
             </div>
