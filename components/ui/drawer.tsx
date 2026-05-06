@@ -1,5 +1,6 @@
 "use client";
 
+import { signOut } from "@/app/auth/action";
 import { cn } from "@/lib/utils";
 import {
   EllipsisVertical,
@@ -72,7 +73,7 @@ export default function Drawer({ children }: { children: ReactNode }) {
           className="drawer-overlay"
         ></label>
 
-        <div className="flex min-h-full flex-col items-start  border-r border-base-content/5 is-drawer-close:w-16 is-drawer-open:w-64 transition-all duration-300">
+        <div className="flex min-h-full flex-col items-start bg-base-200 is-drawer-close:w-14 is-drawer-open:w-64 transition-all duration-300">
           {/* Navigation Links */}
           <ul className="menu w-full grow">
             {sidebarItems.map((item) => {
@@ -82,15 +83,13 @@ export default function Drawer({ children }: { children: ReactNode }) {
                   <Link
                     href={item.link}
                     className={cn(
-                      "flex items-center gap-4 is-drawer-close:tooltip is-drawer-close:tooltip-right",
+                      "is-drawer-close:tooltip is-drawer-close:tooltip-right",
                       isActive && "menu-active",
                     )}
                     data-tip={item.name}
                   >
-                    <item.icon className="size-5 shrink-0" />
-                    <span className="is-drawer-close:hidden whitespace-nowrap">
-                      {item.name}
-                    </span>
+                    <item.icon className="my-1 inline-block size-4" />
+                    <span className="is-drawer-close:hidden">{item.name}</span>
                   </Link>
                 </li>
               );
@@ -98,14 +97,24 @@ export default function Drawer({ children }: { children: ReactNode }) {
           </ul>
 
           {/* User Profile Dropdown */}
-          <div className="dropdown dropdown-top dropdown-center w-full p-2">
+          <div className="dropdown dropdown-top dropdown-start w-full p-2">
             <div
               tabIndex={0}
               role="button"
-              className="btn btn-ghost w-full justify-start gap-4 px-2"
+              className={cn(
+                "btn btn-ghost w-full px-1 flex justify-start gap-4",
+
+                "is-drawer-close:btn-ghost",
+                "is-drawer-close:w-10 is-drawer-close:h-10",
+                "is-drawer-close:p-0",
+                "is-drawer-close:gap-0",
+                "is-drawer-close:rounded-lg",
+                "is-drawer-close:flex is-drawer-close:items-center is-drawer-close:justify-center",
+              )}
             >
-              <div className="avatar">
-                <div className="w-8 rounded-full">
+              {/* Avatar */}
+              <div className="avatar shrink-0">
+                <div className="w-8 rounded-lg">
                   <Image
                     alt="avatar"
                     width={32}
@@ -114,7 +123,9 @@ export default function Drawer({ children }: { children: ReactNode }) {
                   />
                 </div>
               </div>
-              <div className="flex flex-1 items-center justify-between is-drawer-close:hidden overflow-hidden">
+
+              {/* Name + icon */}
+              <div className="flex flex-1 items-center justify-between overflow-hidden is-drawer-close:hidden">
                 <span className="text-sm truncate">johndoe497</span>
                 <EllipsisVertical className="size-4 opacity-50" />
               </div>
@@ -128,7 +139,9 @@ export default function Drawer({ children }: { children: ReactNode }) {
                 <a>Profile</a>
               </li>
               <li>
-                <a>Logout</a>
+                <button type="button" onClick={signOut}>
+                  Logout
+                </button>
               </li>
             </ul>
           </div>
