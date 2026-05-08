@@ -10,33 +10,31 @@ import PostActions from "./_components/post-action";
 
 export default function HomePage() {
   return (
-    <>
-      {/* Main Post Container */}
+    <div className="w-full max-w-xl mx-auto">
+      {" "}
+      {/* Added mx-auto for centering */}
       {postItems.map((post) => (
         <Link
           href={`/post/${post.id}`}
-          className="flex gap-2 p-4 hover:bg-base-content/5 cursor-pointer max-w-2xl"
+          className="flex flex-col gap-2 p-4 hover:bg-base-content/5 cursor-pointer border-b border-base-content/5"
           key={post.id}
         >
-          {/* Left Column: Avatar */}
-          <PostAvatar authorAvatar={post.authorAvatar} />
-
-          {/* Right Column: Content Area */}
-          <div className="flex-1 min-w-0 flex flex-col gap-1">
-            {/* Header: Name, Handle, and Time */}
+          <div className="flex gap-2">
+            <PostAvatar authorAvatar={post.authorAvatar} />
             <PostHeader authorUsername={post.authorUsername} date={post.date} />
-
-            {/* Content */}
-            <PostContent content={post.content} />
-
-            {/* Media: Post Image */}
-            <PostImage image={post.image} />
-
-            {/* Action Buttons */}
-            <PostActions />
           </div>
+
+          <div className="w-full">
+            <PostImage
+              image={post.image}
+              className="relative h-auto min-h-50"
+            />
+          </div>
+
+          <PostContent content={post.content} />
+          <PostActions />
         </Link>
       ))}
-    </>
+    </div>
   );
 }

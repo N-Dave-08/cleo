@@ -8,8 +8,14 @@ export default function PostAvatar({ authorAvatar }: PostAvatarProps) {
   return (
     <div className="shrink-0">
       <div className="avatar">
-        <div className="w-10 h-10 relative rounded-full">
-          <Image fill src={authorAvatar} alt="avatar" />
+        {/* Added 'ring' classes for a more professional, framed look */}
+        <div className="w-10 h-10 relative rounded-full ring-1 ring-base-content/10">
+          <Image
+            fill
+            src={authorAvatar}
+            alt="avatar"
+            className="rounded-full object-cover"
+          />
         </div>
       </div>
     </div>

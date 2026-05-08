@@ -49,12 +49,14 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const pathname = request.nextUrl.pathname;
+
   /**
    * PROTECTED ROUTE LOGIC:
    * If there is no valid user and they are trying to access '/home',
    * we intercept the request and bounce them back to the login page.
    */
-  if (!user && request.nextUrl.pathname.startsWith("/home")) {
+  if (!user && pathname.startsWith("/home")) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -65,9 +67,9 @@ export async function proxy(request: NextRequest) {
    */
   if (
     user &&
-    (request.nextUrl.pathname === "/" ||
-      request.nextUrl.pathname.startsWith("/login") ||
-      request.nextUrl.pathname.startsWith("/signup"))
+    (pathname === "/" ||
+      pathname.startsWith("/login") ||
+      pathname.startsWith("/signup"))
   ) {
     return NextResponse.redirect(new URL("/home", request.url));
   }

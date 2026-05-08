@@ -1,23 +1,46 @@
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 interface PostImageProps {
   image?: string;
+  className?: string;
+  variant?: "feed" | "detail";
 }
 
-export default function PostImage({ image }: PostImageProps) {
+export default function PostImage({
+  image,
+  className,
+  variant = "feed",
+}: PostImageProps) {
   if (!image) return null;
 
-  return (
-    <div className="max-w-full border border-base-content/20 rounded-2xl overflow-hidden bg-base-200">
-      <div className="relative w-full overflow-hidden">
+  if (variant === "feed") {
+    return (
+      <div
+        className={cn(
+          "relative overflow-hidden rounded-xl bg-base-300 w-full",
+          className,
+        )}
+      >
         <Image
-          alt="Post content"
           src={image}
+          alt="Post"
           width={1200}
-          height={675}
-          className="w-full h-auto block object-cover"
+          height={1600}
+          className="w-full h-auto object-contain"
         />
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <Image
+      src={image}
+      alt="Post content"
+      width={1200}
+      height={1600}
+      priority
+      className={cn("h-full w-auto max-w-full object-contain", className)}
+    />
   );
 }

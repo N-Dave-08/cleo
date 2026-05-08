@@ -33,17 +33,17 @@ const actionButtons: ActionButton[] = [
 export default function PostActions() {
   return (
     <div className="flex justify-between">
-      <div className="flex gap-6">
+      <div className="flex gap-2">
         {actionButtons.map((button) => (
           <div className="btn btn-xs btn-ghost" key={button.name}>
-            <button.icon className="h-4 w-4" />
+            <button.icon className="size-[1.2rem]" />
             <span>{button.count}</span>
           </div>
         ))}
       </div>
 
       <div className="btn btn-xs btn-ghost">
-        <Forward className="h-4 w-4" />
+        <Forward className="size-[1.2rem]" />
         <span>34</span>
       </div>
     </div>

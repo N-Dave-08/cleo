@@ -68,9 +68,7 @@ export default function Drawer({
         </nav>
 
         {/* Main Page Content */}
-        <main className={cn("grow", "flex flex-col items-center")}>
-          <div className="w-full max-w-xl">{children}</div>
-        </main>
+        <main className="grow w-full flex flex-col">{children}</main>
       </div>
 
       <div className="drawer-side is-drawer-close:overflow-visible z-20">
