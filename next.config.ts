@@ -14,6 +14,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "api.dicebear.com",
+      },
+      {
+        protocol: "https",
         hostname: "images.unsplash.com",
         pathname: "/**",
       },
@@ -21,6 +25,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "source.unsplash.com",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "wvsjptjubjutumvjfvet.supabase.co",
       },
     ],
   },

@@ -23,7 +23,6 @@ export default function PostHeader({
         {authorUsername}
       </span>
       <div className="flex items-center gap-1 opacity-60">
-        {/* Custom weighted dot using the span method for precision */}
         <span className="w-1 h-1 rounded-full bg-current self-center mx-0.5" />
         <span className="text-xs">{date.toLocaleDateString()}</span>
         <Globe className="w-4 h-4" />

@@ -10,21 +10,24 @@ export default async function FeedLayout({
 }) {
   const supabase = await createClient();
 
-  // Use getUser() for security as it validates the JWT with Supabase
   const {
     data: { user },
     error,
   } = await supabase.auth.getUser();
 
-  // If proxy.ts somehow missed a session expiration, this is your safety net
   if (error || !user) {
     redirect("/login");
   }
 
+  const safeUser = {
+    id: user.id,
+    username: user.user_metadata?.username ?? "no username",
+    avatar_url: user.user_metadata?.avatar_url,
+  };
+
   return (
     <div className="w-full">
-      {/* Pass the user object to your Drawer to personalize the UI */}
-      <Drawer user={user}>{children}</Drawer>
+      <Drawer user={safeUser}>{children}</Drawer>
     </div>
   );
 }

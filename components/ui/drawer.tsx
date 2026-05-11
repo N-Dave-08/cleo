@@ -9,12 +9,14 @@ import {
   Settings,
   PanelLeftOpen,
   Cat,
+  Plus,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
-import { User } from "@supabase/supabase-js";
+import PostCreateModal from "@/app/(app)/home/_components/post-create-modal";
+import { getAvatarUrl } from "@/lib/get-avatar-url";
 
 interface SidebarItem {
   name: string;
@@ -35,12 +37,18 @@ const sidebarItems: SidebarItem[] = [
   },
 ];
 
+type DrawerUser = {
+  id: string;
+  username: string;
+  avatar_url: string | null;
+};
+
 export default function Drawer({
   children,
   user,
 }: {
   children: ReactNode;
-  user: User;
+  user: DrawerUser;
 }) {
   const pathname = usePathname();
 
@@ -65,6 +73,7 @@ export default function Drawer({
               <Cat /> <span>Cleo</span>
             </div>
           </div>
+          <PostCreateModal />
         </nav>
 
         {/* Main Page Content */}
@@ -124,16 +133,15 @@ export default function Drawer({
                     alt="avatar"
                     width={32}
                     height={32}
-                    src="https://img.daisyui.com/images/profile/demo/batperson@192.webp"
+                    unoptimized
+                    src={getAvatarUrl(user.username, user.avatar_url)}
                   />
                 </div>
               </div>
 
               {/* Name + icon */}
               <div className="flex flex-1 items-center justify-between overflow-hidden is-drawer-close:hidden">
-                <span className="text-sm truncate">
-                  {user.user_metadata.username}
-                </span>
+                <span className="text-sm truncate">{user.username}</span>
                 <EllipsisVertical className="size-4 opacity-50" />
               </div>
             </div>
