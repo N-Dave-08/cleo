@@ -10,6 +10,8 @@ import {
   PanelLeftOpen,
   Cat,
   Plus,
+  Send,
+  MessageSquareDot,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -33,6 +35,16 @@ const sidebarItems: SidebarItem[] = [
   {
     icon: Settings,
     name: "Settings",
+    link: "#",
+  },
+  {
+    icon: Send,
+    name: "Messages",
+    link: "#",
+  },
+  {
+    icon: MessageSquareDot,
+    name: "Notifications",
     link: "#",
   },
 ];
@@ -153,6 +165,10 @@ export default function Drawer({
               <li>
                 <a>Profile</a>
               </li>
+              <li>
+                <a>Activity</a>
+              </li>
+              <hr className="text-base-content/5" />
               <li>
                 <button type="button" onClick={signOut}>
                   Logout

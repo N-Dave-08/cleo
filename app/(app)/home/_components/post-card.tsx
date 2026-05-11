@@ -38,9 +38,9 @@ export default function PostCard({ post }: PostCardProps) {
 
       <PostImage image={post.media_url || undefined} />
 
-      <PostActions postId={post.id} />
-
       <PostContent content={post.content} />
+
+      <PostActions postId={post.id} />
     </div>
   );
 }
