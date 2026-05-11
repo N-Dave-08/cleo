@@ -1,41 +1,25 @@
-import { createClient } from "@/lib/supabase/server-client";
+import { getPostById } from "@/lib/queries/posts";
 import { notFound } from "next/navigation";
-
-import PostAvatar from "../../home/_components/post-avatar";
-import PostContent from "../../home/_components/post-content";
 import PostImage from "../../home/_components/post-image";
-import PostActions from "../../home/_components/post-action";
-
-import { Globe } from "lucide-react";
-import { cn } from "@/lib/utils";
+import PostAvatar from "../../home/_components/post-avatar";
 import { getAvatarUrl } from "@/lib/get-avatar-url";
+import { Globe } from "lucide-react";
+import PostContent from "../../home/_components/post-content";
+import PostActions from "../../home/_components/post-action";
+import { cn } from "@/lib/utils";
 
-export default async function PostPage({
-  params,
-}: {
+type Props = {
   params: Promise<{ id: string }>;
-}) {
+};
+
+export default async function PostPage({ params }: Props) {
   const { id } = await params;
 
-  const supabase = await createClient();
+  if (!id) return notFound();
 
-  const { data: post, error } = await supabase
-    .from("posts")
-    .select(
-      `
-      *,
-      profiles (
-        username,
-        avatar_url
-      )
-    `,
-    )
-    .eq("id", id)
-    .single();
+  const post = await getPostById(id);
 
-  if (error || !post) {
-    return notFound();
-  }
+  if (!post) return notFound();
 
   return (
     <div
@@ -45,15 +29,9 @@ export default async function PostPage({
       )}
     >
       {/* LEFT IMAGE SECTION */}
-      <div
-        className={cn(
-          "relative flex items-center justify-center overflow-hidden lg:col-span-8",
-          "h-[60vh] lg:h-full",
-        )}
-      >
+      <div className="relative flex items-center justify-center overflow-hidden lg:col-span-8 h-[60vh] lg:h-full">
         {post.media_url && (
           <>
-            {/* BLURRED BACKGROUND */}
             <div
               className="absolute inset-0 scale-150 blur-lg opacity-40"
               style={{
@@ -62,11 +40,8 @@ export default async function PostPage({
                 backgroundPosition: "center",
               }}
             />
-
-            {/* OVERLAY */}
             <div className="absolute inset-0 bg-black/40" />
 
-            {/* MAIN IMAGE */}
             <div className="relative z-10 w-full h-full p-8 lg:p-12 flex items-center justify-center">
               <PostImage image={post.media_url} variant="detail" />
             </div>
@@ -74,14 +49,8 @@ export default async function PostPage({
         )}
       </div>
 
-      {/* RIGHT CONTENT SECTION */}
-      <div
-        className={cn(
-          "flex flex-col min-h-0 lg:col-span-4",
-          "bg-base-100 border-l border-base-content/5",
-        )}
-      >
-        {/* AUTHOR */}
+      {/* RIGHT CONTENT */}
+      <div className="flex flex-col min-h-0 lg:col-span-4 bg-base-100 border-l border-base-content/5">
         <div className="flex gap-2 p-4 border-b border-base-content/5">
           <PostAvatar
             authorAvatar={getAvatarUrl(
@@ -91,7 +60,7 @@ export default async function PostPage({
           />
 
           <div className="flex flex-col">
-            <span className="text-sm font-semibold leading-tight">
+            <span className="text-sm font-semibold">
               {post.profiles.username}
             </span>
 
@@ -99,22 +68,19 @@ export default async function PostPage({
               <span className="text-xs">
                 {new Date(post.created_at).toLocaleDateString()}
               </span>
-
               <Globe className="size-3" />
             </div>
           </div>
         </div>
 
-        {/* CONTENT */}
         <div className="grow overflow-y-auto p-4 space-y-4">
-          <PostContent content={post.content} isDetailView={true} />
+          <PostContent content={post.content} isDetailView />
 
           <div className="pt-4 border-t border-base-content/5">
             <p className="text-xs opacity-40 italic">No comments yet...</p>
           </div>
         </div>
 
-        {/* ACTIONS */}
         <div className="p-4 border-t border-base-content/5 mt-auto">
           <PostActions postId={post.id} />
 
@@ -124,7 +90,6 @@ export default async function PostPage({
               placeholder="Add a comment..."
               className="input input-ghost input-sm w-full"
             />
-
             <button className="btn btn-ghost btn-sm text-primary font-bold">
               Post
             </button>

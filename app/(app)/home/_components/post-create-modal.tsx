@@ -165,8 +165,12 @@ export default function PostCreateModal() {
             <div className="flex justify-between p-4 border-b">
               <span className="font-semibold">Create post</span>
 
-              <button type="button" onClick={close}>
-                <X />
+              <button
+                className="btn btn-sm btn-circle btn-ghost"
+                type="button"
+                onClick={close}
+              >
+                <X className="size-4" />
               </button>
             </div>
 

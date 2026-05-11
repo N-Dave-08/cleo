@@ -27,6 +27,8 @@ export default function PostImage({
           alt="Post"
           width={1200}
           height={1600}
+          priority
+          loading="eager"
           className="w-full h-auto object-contain"
         />
       </div>
@@ -40,6 +42,7 @@ export default function PostImage({
       width={1200}
       height={1600}
       priority
+      loading="eager"
       className={cn("h-full w-auto max-w-full object-contain", className)}
     />
   );

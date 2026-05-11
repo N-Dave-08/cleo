@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server-client";
 import { uploadPostImage } from "@/lib/upload-post-image";
+import { revalidatePath } from "next/cache";
 
 export async function createPost(formData: FormData) {
   const supabase = await createClient();
@@ -82,4 +83,6 @@ export async function createPost(formData: FormData) {
    * so they can be handled properly.
    */
   if (error) throw new Error(error.message);
+
+  revalidatePath("/home");
 }
