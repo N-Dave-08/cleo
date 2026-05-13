@@ -9,7 +9,6 @@ import {
   Settings,
   PanelLeftOpen,
   Cat,
-  Plus,
   Send,
   MessageSquareDot,
 } from "lucide-react";

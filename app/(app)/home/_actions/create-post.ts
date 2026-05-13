@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server-client";
-import { uploadPostImage } from "@/lib/upload-post-image";
+import { uploadPostImages } from "@/lib/upload-post-images";
 import { revalidatePath } from "next/cache";
 
 export async function createPost(formData: FormData) {
@@ -25,7 +25,9 @@ export async function createPost(formData: FormData) {
    * Since FormData values are typed broadly,
    * we manually assert it as File | null.
    */
-  const file = formData.get("image") as File | null;
+  const files = formData
+    .getAll("images")
+    .filter((value): value is File => value instanceof File);
 
   /**
    * Retrieve the currently authenticated user
@@ -43,46 +45,36 @@ export async function createPost(formData: FormData) {
    */
   if (!user) throw new Error("Unauthorized");
 
-  /**
-   * This will store the uploaded image URL
-   * after uploading to Supabase Storage.
-   *
-   * Default is null because posts may contain
-   * text only without an image.
-   */
-  let mediaUrl: string | null = null;
+  const { data: post, error: postError } = await supabase
+    .from("posts")
+    .insert({ user_id: user.id, content })
+    .select()
+    .single();
 
-  /**
-   * Upload image ONLY if a file exists.
-   *
-   * uploadPostImage handles:
-   * - generating unique file names
-   * - uploading to storage bucket
-   * - returning the public URL
-   */
-  if (file) {
-    mediaUrl = await uploadPostImage(file, user.id);
+  if (postError) {
+    throw new Error(postError.message);
   }
 
-  /**
-   * Insert the new post into the database.
-   *
-   * We store:
-   * - the authenticated user's id
-   * - post text content
-   * - optional uploaded image URL
-   */
-  const { error } = await supabase.from("posts").insert({
-    user_id: user.id,
-    content,
-    media_url: mediaUrl,
-  });
+  let uploadUrls: string[] = [];
 
-  /**
-   * Surface database errors to the client
-   * so they can be handled properly.
-   */
-  if (error) throw new Error(error.message);
+  if (files.length > 0) {
+    uploadUrls = await uploadPostImages(files, user.id);
+  }
 
+  if (uploadUrls.length > 0) {
+    const imageRows = uploadUrls.map((url, index) => ({
+      post_id: post.id,
+      image_url: url,
+      position: index,
+    }));
+
+    const { error: imagesError } = await supabase
+      .from("post_images")
+      .insert(imageRows);
+
+    if (imagesError) {
+      throw new Error(imagesError.message);
+    }
+  }
   revalidatePath("/home");
 }

@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server-client";
 
 /**
- * Get feed posts (Home page)
+ * Get feed posts
  */
 export async function getFeedPosts() {
   const supabase = await createClient();
@@ -14,23 +14,30 @@ export async function getFeedPosts() {
       profiles (
         username,
         avatar_url
+      ),
+      post_images (
+        id,
+        image_url,
+        position
       )
     `,
     )
-    .order("created_at", { ascending: false });
+    .order("created_at", {
+      ascending: false,
+    });
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    throw new Error(error.message);
+  }
 
   return data;
 }
 
 /**
- * Get single post by ID (Post detail page)
+ * Get single post
  */
 export async function getPostById(id?: string) {
-  if (!id) {
-    throw new Error("Post ID is required");
-  }
+  if (!id) return null;
 
   const supabase = await createClient();
 
@@ -42,13 +49,20 @@ export async function getPostById(id?: string) {
       profiles (
         username,
         avatar_url
+      ),
+      post_images (
+        id,
+        image_url,
+        position
       )
     `,
     )
     .eq("id", id)
     .single();
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    throw new Error(error.message);
+  }
 
   return data;
 }

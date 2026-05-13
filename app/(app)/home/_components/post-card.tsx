@@ -1,21 +1,26 @@
-import Link from "next/link";
 import PostAvatar from "./post-avatar";
 import PostContent from "./post-content";
 import PostHeader from "./post-header";
-import PostImage from "./post-image";
 import PostActions from "./post-action";
 import { getAvatarUrl } from "@/lib/get-avatar-url";
+import PostMedia from "./post-media";
 
 interface PostCardProps {
   post: {
     id: string;
     content: string;
-    media_url: string | null;
     created_at: string;
+
     profiles: {
       username: string;
       avatar_url: string | null;
     };
+
+    post_images: {
+      id: string;
+      image_url: string;
+      position: number;
+    }[];
   };
 }
 
@@ -36,7 +41,7 @@ export default function PostCard({ post }: PostCardProps) {
         />
       </div>
 
-      <PostImage image={post.media_url || undefined} />
+      <PostMedia images={post.post_images} mode="feed" />
 
       <PostContent content={post.content} />
 
