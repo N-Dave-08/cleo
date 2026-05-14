@@ -1,56 +1,60 @@
-import {
-  Bookmark,
-  Forward,
-  Heart,
-  LucideIcon,
-  MessageCircle,
-} from "lucide-react";
+"use client";
+
+import { useLike } from "@/lib/hooks/use-like";
+import { cn } from "@/lib/utils";
+import { Bookmark, Forward, Heart, MessageCircle } from "lucide-react";
 import Link from "next/link";
-
-interface ActionButton {
-  name: string;
-  count: number;
-  icon: LucideIcon;
-}
-
-const actionButtons: ActionButton[] = [
-  {
-    name: "like",
-    count: 487,
-    icon: Heart,
-  },
-  {
-    name: "bookmark",
-    count: 90,
-    icon: Bookmark,
-  },
-];
 
 interface PostActionsProps {
   postId: string;
+  initialLiked: boolean;
+  likeCount: number;
+  commentCount: number;
 }
 
-export default function PostActions({ postId }: PostActionsProps) {
+export default function PostActions({
+  postId,
+  initialLiked,
+  likeCount,
+  commentCount,
+}: PostActionsProps) {
+  const { liked, toggleLike, count } = useLike(postId, initialLiked, likeCount);
+
   return (
     <div className="flex justify-between">
-      <div className="flex gap-2">
-        {actionButtons.map((button) => (
-          <div className="btn btn-xs btn-ghost" key={button.name}>
-            <button.icon className="size-[1.2rem]" />
-            <span>{button.count}</span>
-          </div>
-        ))}
+      <div className="flex gap-3 items-center">
+        {/* LIKE */}
+        <button
+          onClick={toggleLike}
+          className="btn btn-xs btn-ghost flex items-center gap-1"
+        >
+          <Heart
+            className={cn("size-[1.2rem]", {
+              "fill-red-500 text-red-500": liked,
+            })}
+          />
+          <span>{count}</span>
+        </button>
 
-        <Link href={`/post/${postId}`} className="btn btn-xs btn-ghost">
+        {/* COMMENTS */}
+        <Link
+          href={`/post/${postId}`}
+          className="btn btn-xs btn-ghost flex items-center gap-1"
+        >
           <MessageCircle className="size-[1.2rem]" />
-          <span>12</span>
+          <span>{commentCount}</span>
         </Link>
+
+        {/* BOOKMARK (placeholder for later) */}
+        <button className="btn btn-xs btn-ghost">
+          <Bookmark className="size-[1.2rem]" />
+        </button>
       </div>
 
-      <div className="btn btn-xs btn-ghost">
+      <button className="btn btn-xs btn-ghost">
         <Forward className="size-[1.2rem]" />
-        <span>34</span>
-      </div>
+        <span>Share</span>
+      </button>
     </div>
   );
 }

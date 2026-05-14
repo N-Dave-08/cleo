@@ -23,7 +23,7 @@ export default function RootLayout({
       className={` ${inter.variable} h-full antialiased`}
       data-theme="caramellatte"
     >
-      <body className="min-h-full flex flex-col font-(family-name:--font-inter)">
+      <body className="h-screen flex flex-col font-(family-name:--font-inter)">
         {children}
       </body>
     </html>

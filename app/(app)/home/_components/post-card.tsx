@@ -1,3 +1,4 @@
+import type { Post } from "@/app/(app)/types";
 import PostAvatar from "./post-avatar";
 import PostContent from "./post-content";
 import PostHeader from "./post-header";
@@ -6,25 +7,18 @@ import { getAvatarUrl } from "@/lib/get-avatar-url";
 import PostMedia from "./post-media";
 
 interface PostCardProps {
-  post: {
-    id: string;
-    content: string;
-    created_at: string;
-
-    profiles: {
-      username: string;
-      avatar_url: string | null;
-    };
-
-    post_images: {
-      id: string;
-      image_url: string;
-      position: number;
-    }[];
-  };
+  post: Post;
+  currentUserId: string | null;
 }
 
-export default function PostCard({ post }: PostCardProps) {
+export default function PostCard({ post, currentUserId }: PostCardProps) {
+  const likeCount = post.likes?.length ?? 0;
+  const commentCount = post.comments?.length ?? 0;
+
+  const initialLiked =
+    !!currentUserId &&
+    post.likes?.some((like) => like.user_id === currentUserId);
+
   return (
     <div className="flex flex-col gap-2 p-4 border-b border-base-content/5">
       <div className="flex gap-2">
@@ -45,7 +39,12 @@ export default function PostCard({ post }: PostCardProps) {
 
       <PostContent content={post.content} />
 
-      <PostActions postId={post.id} />
+      <PostActions
+        postId={post.id}
+        initialLiked={initialLiked}
+        likeCount={likeCount}
+        commentCount={commentCount}
+      />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import Drawer from "@/components/ui/drawer";
-import { createClient } from "@/lib/supabase/server-client";
+import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import React from "react";
 
@@ -26,7 +26,7 @@ export default async function FeedLayout({
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full h-screen flex flex-col">
       <Drawer user={safeUser}>{children}</Drawer>
     </div>
   );

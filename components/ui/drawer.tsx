@@ -64,10 +64,10 @@ export default function Drawer({
   const pathname = usePathname();
 
   return (
-    <div className="drawer lg:drawer-open">
+    <div className="drawer lg:drawer-open h-full">
       <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
 
-      <div className="drawer-content flex flex-col">
+      <div className="drawer-content flex flex-col flex-1 min-h-0 h-full">
         {/* Navbar */}
         <nav className="navbar w-full border border-b border-base-content/5 bg-base-100 z-10 sticky top-0">
           <div className="flex-none">
@@ -88,7 +88,9 @@ export default function Drawer({
         </nav>
 
         {/* Main Page Content */}
-        <main className="grow w-full flex flex-col">{children}</main>
+        <main className="grow w-full flex flex-col min-h-0 overflow-auto h-full">
+          {children}
+        </main>
       </div>
 
       <div className="drawer-side is-drawer-close:overflow-visible z-20">

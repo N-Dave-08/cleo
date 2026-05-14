@@ -54,21 +54,41 @@ export default function PostMedia({ images, mode = "feed" }: PostMediaProps) {
     >
       {/* ================= FEED MODE ================= */}
       {mode === "feed" && (
-        <div className="relative w-full overflow-hidden rounded-xl">
-          <Image
-            src={active}
-            alt="post-image"
-            width={1200}
-            height={1200}
-            className="w-full h-auto object-cover"
-          />
+        <div className="relative overflow-hidden rounded-xl aspect-4/5 bg-base-300">
+          {/* SLIDER TRACK */}
+          <div
+            className="flex h-full transition-transform duration-500 ease-in-out"
+            style={{
+              width: `${normalized.length * 100}%`,
+              transform: `translateX(-${current * (100 / normalized.length)}%)`,
+            }}
+          >
+            {normalized.map((img, index) => (
+              <div
+                key={index}
+                className="relative h-full shrink-0"
+                style={{
+                  width: `${100 / normalized.length}%`,
+                }}
+              >
+                <Image
+                  src={img}
+                  alt={`post-image-${index}`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 700px"
+                  className="object-cover"
+                />
+              </div>
+            ))}
+          </div>
 
+          {/* NAVIGATION */}
           {isMultiple && (
             <>
               {canGoPrev && (
                 <button
                   onClick={prev}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 btn btn-circle btn-xs bg-black/60 text-white"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 btn btn-circle btn-xs bg-black/60 text-white z-20"
                 >
                   <ChevronLeft className="size-4" />
                 </button>
@@ -77,16 +97,22 @@ export default function PostMedia({ images, mode = "feed" }: PostMediaProps) {
               {canGoNext && (
                 <button
                   onClick={next}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 btn btn-circle btn-xs bg-black/60 text-white"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 btn btn-circle btn-xs bg-black/60 text-white z-20"
                 >
                   <ChevronRight className="size-4" />
                 </button>
               )}
             </>
           )}
+
+          {/* IMAGE COUNT */}
+          {isMultiple && (
+            <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-black/60 text-white text-xs z-20">
+              {current + 1}/{normalized.length}
+            </div>
+          )}
         </div>
       )}
-
       {/* ================= DETAIL MODE ================= */}
       {mode === "detail" && (
         <div className="relative w-full h-full">

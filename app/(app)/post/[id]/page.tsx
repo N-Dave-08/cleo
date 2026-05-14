@@ -1,4 +1,5 @@
 import { getPostById } from "@/lib/queries/posts";
+import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import PostPageClient from "./_components/post-page-client";
 
@@ -6,16 +7,14 @@ type Props = {
   params: Promise<{ id: string }>;
 };
 
-type PostImage = {
-  id: string;
-  image_url: string;
-  position: number;
-};
-
 export default async function PostPage({ params }: Props) {
+  const supabase = await createClient();
+
   const { id } = await params;
 
-  if (!id) return notFound();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const post = await getPostById(id);
 
@@ -23,12 +22,16 @@ export default async function PostPage({ params }: Props) {
 
   const images =
     post.post_images?.length > 0
-      ? (post.post_images as PostImage[])
+      ? post.post_images
           .sort((a, b) => a.position - b.position)
           .map((img) => img.image_url)
-      : post.media_url
-        ? [post.media_url]
-        : [];
+      : [];
 
-  return <PostPageClient post={post} images={images} />;
+  return (
+    <PostPageClient
+      post={post}
+      images={images}
+      currentUserId={user?.id ?? null}
+    />
+  );
 }

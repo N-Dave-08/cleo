@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server-client";
+import { createClient } from "@/lib/supabase/server";
 import { uploadPostImages } from "@/lib/upload-post-images";
 import { revalidatePath } from "next/cache";
 

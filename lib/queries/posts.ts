@@ -1,10 +1,15 @@
-import { createClient } from "@/lib/supabase/server-client";
+import { Post } from "@/app/(app)/types";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * Get feed posts
  */
 export async function getFeedPosts() {
   const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const { data, error } = await supabase
     .from("posts")
@@ -19,24 +24,34 @@ export async function getFeedPosts() {
         id,
         image_url,
         position
-      )
+      ),
+      likes (user_id),
+      comments (
+      id,
+  content,
+  created_at,
+  user_id,
+  profiles (
+    username,
+    avatar_url
+  )
+)
     `,
     )
-    .order("created_at", {
-      ascending: false,
-    });
+    .order("created_at", { ascending: false });
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
-  return data;
+  return {
+    posts: data,
+    userId: user?.id ?? null,
+  };
 }
 
 /**
  * Get single post
  */
-export async function getPostById(id?: string) {
+export async function getPostById(id?: string): Promise<Post | null> {
   if (!id) return null;
 
   const supabase = await createClient();
@@ -54,15 +69,60 @@ export async function getPostById(id?: string) {
         id,
         image_url,
         position
+      ),
+      likes (user_id),
+      comments (
+        id,
+        content,
+        created_at,
+        user_id,
+        profiles (
+          username,
+          avatar_url
+        )
       )
-    `,
+      `,
     )
     .eq("id", id)
     .single();
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   return data;
+}
+/**
+ * Get comments
+ */
+export async function getComments(postId: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("comments")
+    .select("*, profiles(*)")
+    .eq("post_id", postId)
+    .order("created_at", { ascending: true });
+
+  if (error) throw error;
+  return data;
+}
+
+/**
+ * Create comments
+ */
+export async function createComment(postId: string, content: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return;
+
+  const { error } = await supabase.from("comments").insert({
+    post_id: postId,
+    user_id: user.id,
+    content,
+  });
+
+  if (error) throw error;
 }

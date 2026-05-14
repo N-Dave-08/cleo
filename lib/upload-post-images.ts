@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server-client";
+import { createClient } from "@/lib/supabase/server";
 
 export async function uploadPostImages(files: File[], userId: string) {
   const supabase = await createClient();
