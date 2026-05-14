@@ -1,79 +1,45 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useMemo } from "react";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import { getCurrentUserClient } from "../supabase/auth-client";
+import type { PostComment } from "@/app/(app)/types";
 
-export type CommentProfile = {
-  username: string;
-  avatar_url: string | null;
+type OptimisticComment = PostComment & {
+  tempId: string;
 };
 
-export type Comment = {
-  id: string;
-  content: string;
-  created_at: string;
-  user_id: string;
-  profiles: CommentProfile | null;
-
-  // 👇 optimistic tracking
-  _optimistic?: boolean;
-};
-
-// =======================
-// Supabase raw shape
-// =======================
-type SupabaseCommentRow = {
-  id: string;
-  content: string;
-  created_at: string;
-  user_id: string;
-  profiles: CommentProfile | CommentProfile[] | null | undefined;
-};
-
-// =======================
-// Normalizer
-// =======================
-function normalizeComment(row: SupabaseCommentRow): Comment {
-  const profileRaw = Array.isArray(row.profiles)
-    ? row.profiles[0]
-    : row.profiles;
-
-  return {
-    id: row.id,
-    content: row.content,
-    created_at: row.created_at,
-    user_id: row.user_id,
-    profiles: profileRaw
-      ? {
-          username: profileRaw.username,
-          avatar_url: profileRaw.avatar_url ?? null,
-        }
-      : null,
-  };
-}
-
-// =======================
-// Hook
-// =======================
-export function useComments(postId: string, initialComments: Comment[]) {
+export function useComments(postId: string, initialComments: PostComment[]) {
   const supabase = getSupabaseBrowser();
 
-  const [comments, setComments] = useState<Comment[]>(initialComments);
+  // ✅ server state (source of truth)
+  const [confirmed, setConfirmed] = useState<PostComment[]>(initialComments);
+
+  // ✅ UI-only temporary state
+  const [optimistic, setOptimistic] = useState<OptimisticComment[]>([]);
+
   const [isPending, startTransition] = useTransition();
+
+  /**
+   * FINAL RENDER MODEL
+   * Optimistic comments are treated as a separate UI layer
+   */
+  const comments = useMemo(() => {
+    return [...optimistic, ...confirmed];
+  }, [optimistic, confirmed]);
 
   async function addComment(content: string) {
     const tempId = crypto.randomUUID();
-
     const user = await getCurrentUserClient();
 
     if (!user) return;
 
-    // =======================
-    // OPTIMISTIC COMMENT
-    // =======================
-    const optimistic: Comment = {
+    // =========================
+    // CREATE OPTIMISTIC ITEM (UI ONLY)
+    // =========================
+    const optimisticComment: OptimisticComment = {
       id: tempId,
+      tempId,
       content,
       created_at: new Date().toISOString(),
       user_id: user.id,
@@ -81,10 +47,10 @@ export function useComments(postId: string, initialComments: Comment[]) {
         username: user.user_metadata?.username ?? "You",
         avatar_url: user.user_metadata?.avatar_url ?? null,
       },
-      _optimistic: true,
     };
 
-    setComments((prev) => [optimistic, ...prev]);
+    // add immediately to UI
+    setOptimistic((prev) => [optimisticComment, ...prev]);
 
     startTransition(async () => {
       const { data, error } = await supabase
@@ -108,24 +74,24 @@ export function useComments(postId: string, initialComments: Comment[]) {
         )
         .single();
 
-      // =======================
-      // FAIL → rollback
-      // =======================
+      /**
+       * ❌ FAILURE
+       * remove optimistic item completely
+       */
       if (error || !data) {
-        setComments((prev) =>
-          prev.filter((c) => !(c._optimistic && c.id === tempId)),
-        );
+        setOptimistic((prev) => prev.filter((c) => c.tempId !== tempId));
         return;
       }
 
-      const normalized = normalizeComment(data as SupabaseCommentRow);
+      /**
+       * ❌ REMOVE OPTIMISTIC FIRST (NO MERGE LOGIC)
+       */
+      setOptimistic((prev) => prev.filter((c) => c.tempId !== tempId));
 
-      // =======================
-      // SUCCESS → replace optimistic
-      // =======================
-      setComments((prev) =>
-        prev.map((c) => (c._optimistic && c.id === tempId ? normalized : c)),
-      );
+      /**
+       * ✔ ADD SERVER RESULT (SOURCE OF TRUTH)
+       */
+      setConfirmed((prev) => [data as PostComment, ...prev]);
     });
   }
 

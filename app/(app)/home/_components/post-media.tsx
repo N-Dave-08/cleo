@@ -4,17 +4,10 @@ import { useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
-type ImageItem =
-  | string
-  | {
-      id?: string;
-      image_url: string;
-      position?: number;
-    };
+import type { PostImage } from "../../types";
 
 interface PostMediaProps {
-  images: ImageItem[];
+  images: PostImage[];
   mode?: "feed" | "detail";
 }
 

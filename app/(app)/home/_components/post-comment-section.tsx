@@ -1,21 +1,11 @@
 "use client";
 
 import { useComments } from "@/lib/hooks/use-comment";
-
-type Comment = {
-  id: string;
-  content: string;
-  created_at: string;
-  user_id: string;
-  profiles: {
-    username: string;
-    avatar_url: string | null;
-  } | null;
-};
+import { PostComment } from "../../types";
 
 type Props = {
   postId: string;
-  initialComments: Comment[];
+  initialComments: PostComment[];
 };
 
 export default function PostCommentSection({ postId, initialComments }: Props) {

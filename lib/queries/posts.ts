@@ -1,6 +1,6 @@
-import { Post } from "@/app/(app)/types";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUserServer } from "../supabase/auth-server";
+import type { Post } from "@/app/(app)/types";
 
 /**
  * Get feed posts
@@ -24,7 +24,8 @@ export async function getFeedPosts() {
         image_url,
         position
       ),
-      likes (user_id)
+      likes (user_id),
+      comments(id)
     `,
     )
     .order("created_at", { ascending: false });
@@ -32,7 +33,7 @@ export async function getFeedPosts() {
   if (error) throw new Error(error.message);
 
   return {
-    posts: data,
+    posts: (data ?? []) as Post[],
     userId: user?.id ?? null,
   };
 }
@@ -77,8 +78,9 @@ export async function getPostById(id?: string): Promise<Post | null> {
 
   if (error) throw new Error(error.message);
 
-  return data;
+  return data as Post;
 }
+
 /**
  * Get comments
  */
@@ -92,11 +94,12 @@ export async function getComments(postId: string) {
     .order("created_at", { ascending: true });
 
   if (error) throw error;
+
   return data;
 }
 
 /**
- * Create comments
+ * Create comment
  */
 export async function createComment(postId: string, content: string) {
   const supabase = await createClient();
