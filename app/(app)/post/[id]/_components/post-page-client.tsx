@@ -18,17 +18,11 @@ export default function PostPageClient({
   post: Post;
   currentUserId: string | null;
 }) {
-  /**
-   * COMMENTS
-   */
-  const { comments, addComment, isPending } = useComments(
+  const { comments, addComment, isPending, count } = useComments(
     post.id,
     post.comments,
   );
 
-  /**
-   * LIKES
-   */
   const likeCount = post.likes.length;
 
   const initialLiked =
@@ -36,14 +30,14 @@ export default function PostPageClient({
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 h-full min-h-0 overflow-hidden">
-      {/* ================= LEFT / MEDIA ================= */}
+      {/* LEFT MEDIA */}
       <div className="lg:col-span-8 h-[40vh] lg:h-full bg-base-300">
         <PostMedia images={post.post_images} mode="detail" />
       </div>
 
-      {/* ================= RIGHT PANEL ================= */}
+      {/* RIGHT PANEL */}
       <div className="lg:col-span-4 flex flex-col h-full min-h-0 bg-base-100">
-        {/* ===== HEADER ===== */}
+        {/* HEADER */}
         <div className="p-4 flex items-center gap-2 border-b border-base-content/5 shrink-0">
           <PostAvatar
             authorAvatar={getAvatarUrl(
@@ -64,22 +58,22 @@ export default function PostPageClient({
           </div>
         </div>
 
-        {/* ===== CONTENT ===== */}
+        {/* CONTENT */}
         <div className="px-4 py-3 shrink-0">
           <PostContent content={post.content} isDetailView />
         </div>
 
-        {/* ===== ACTIONS ===== */}
+        {/* ACTIONS */}
         <div className="px-4 pb-3 border-b border-base-content/5 shrink-0">
           <PostActions
             postId={post.id}
             initialLiked={initialLiked}
             likeCount={likeCount}
-            commentCount={post.comments.length}
+            commentCount={count}
           />
         </div>
 
-        {/* ===== COMMENTS ===== */}
+        {/* COMMENTS */}
         <div className="flex-1 min-h-0 overflow-y-auto px-4 py-3 space-y-4">
           {comments.length === 0 ? (
             <div className="text-xs opacity-40 text-center py-10">
@@ -100,7 +94,7 @@ export default function PostPageClient({
           )}
         </div>
 
-        {/* ===== INPUT ===== */}
+        {/* INPUT */}
         <div className="border-t border-base-content/5 p-3 shrink-0 bg-base-100">
           <form
             onSubmit={(e) => {
@@ -111,7 +105,6 @@ export default function PostPageClient({
               if (!input.value.trim()) return;
 
               addComment(input.value);
-
               input.value = "";
             }}
             className="flex gap-2"

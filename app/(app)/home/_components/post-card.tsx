@@ -14,8 +14,6 @@ interface PostCardProps {
 export default function PostCard({ post, currentUserId }: PostCardProps) {
   const likeCount = post.likes?.length ?? 0;
 
-  const commentCount = post.comments.length;
-
   const initialLiked =
     !!currentUserId &&
     post.likes?.some((like) => like.user_id === currentUserId);

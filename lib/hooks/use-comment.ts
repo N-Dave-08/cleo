@@ -12,21 +12,26 @@ type OptimisticComment = PostComment & {
 export function useComments(postId: string, initialComments: PostComment[]) {
   const supabase = getSupabaseBrowser();
 
-  // ✅ server state (source of truth)
   const [confirmed, setConfirmed] = useState<PostComment[]>(initialComments);
 
-  // ✅ UI-only temporary state
   const [optimistic, setOptimistic] = useState<OptimisticComment[]>([]);
 
   const [isPending, startTransition] = useTransition();
 
   /**
-   * FINAL RENDER MODEL
-   * Optimistic comments are treated as a separate UI layer
+   * Merge + SORT ONCE (always newest first)
    */
   const comments = useMemo(() => {
-    return [...optimistic, ...confirmed];
-  }, [optimistic, confirmed]);
+    return [...confirmed, ...optimistic].sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    );
+  }, [confirmed, optimistic]);
+
+  /**
+   * LIVE COUNT (this fixes your refresh issue)
+   */
+  const count = confirmed.length + optimistic.length;
 
   async function addComment(content: string) {
     const tempId = crypto.randomUUID();
@@ -34,9 +39,6 @@ export function useComments(postId: string, initialComments: PostComment[]) {
 
     if (!user) return;
 
-    // =========================
-    // CREATE OPTIMISTIC ITEM (UI ONLY)
-    // =========================
     const optimisticComment: OptimisticComment = {
       id: tempId,
       tempId,
@@ -49,8 +51,8 @@ export function useComments(postId: string, initialComments: PostComment[]) {
       },
     };
 
-    // add immediately to UI
-    setOptimistic((prev) => [optimisticComment, ...prev]);
+    // append ONLY (no prepend)
+    setOptimistic((prev) => [...prev, optimisticComment]);
 
     startTransition(async () => {
       const { data, error } = await supabase
@@ -74,24 +76,13 @@ export function useComments(postId: string, initialComments: PostComment[]) {
         )
         .single();
 
-      /**
-       * ❌ FAILURE
-       * remove optimistic item completely
-       */
-      if (error || !data) {
-        setOptimistic((prev) => prev.filter((c) => c.tempId !== tempId));
-        return;
-      }
-
-      /**
-       * ❌ REMOVE OPTIMISTIC FIRST (NO MERGE LOGIC)
-       */
+      // rollback optimistic
       setOptimistic((prev) => prev.filter((c) => c.tempId !== tempId));
 
-      /**
-       * ✔ ADD SERVER RESULT (SOURCE OF TRUTH)
-       */
-      setConfirmed((prev) => [data as PostComment, ...prev]);
+      if (error || !data) return;
+
+      // append confirmed
+      setConfirmed((prev) => [...prev, data as PostComment]);
     });
   }
 
@@ -99,5 +90,6 @@ export function useComments(postId: string, initialComments: PostComment[]) {
     comments,
     addComment,
     isPending,
+    count,
   };
 }
