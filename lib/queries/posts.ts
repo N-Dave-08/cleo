@@ -1,5 +1,6 @@
 import { Post } from "@/app/(app)/types";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUserServer } from "../supabase/auth-server";
 
 /**
  * Get feed posts
@@ -7,9 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 export async function getFeedPosts() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUserServer();
 
   const { data, error } = await supabase
     .from("posts")
@@ -25,17 +24,7 @@ export async function getFeedPosts() {
         image_url,
         position
       ),
-      likes (user_id),
-      comments (
-      id,
-  content,
-  created_at,
-  user_id,
-  profiles (
-    username,
-    avatar_url
-  )
-)
+      likes (user_id)
     `,
     )
     .order("created_at", { ascending: false });
@@ -112,9 +101,7 @@ export async function getComments(postId: string) {
 export async function createComment(postId: string, content: string) {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUserServer();
 
   if (!user) return;
 

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { getSupabaseBrowser } from "@/lib/supabase/client";
+import { getCurrentUserClient } from "../supabase/auth-client";
 
-const supabase = createClient();
+const supabase = getSupabaseBrowser();
 
 export function useLike(
   postId: string,
@@ -30,13 +31,9 @@ export function useLike(
     }
 
     startTransition(async () => {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+      const user = await getCurrentUserClient();
 
-      if (userError || !user) {
-        // rollback
+      if (!user) {
         setLiked(prevLiked);
         setCount(prevCount);
         return;

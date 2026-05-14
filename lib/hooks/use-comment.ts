@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { getSupabaseBrowser } from "@/lib/supabase/client";
+import { getCurrentUserClient } from "../supabase/auth-client";
 
 export type CommentProfile = {
   username: string;
@@ -14,9 +15,14 @@ export type Comment = {
   created_at: string;
   user_id: string;
   profiles: CommentProfile | null;
+
+  // 👇 optimistic tracking
+  _optimistic?: boolean;
 };
 
-// Supabase raw shape (strict but flexible)
+// =======================
+// Supabase raw shape
+// =======================
 type SupabaseCommentRow = {
   id: string;
   content: string;
@@ -25,7 +31,9 @@ type SupabaseCommentRow = {
   profiles: CommentProfile | CommentProfile[] | null | undefined;
 };
 
-// normalize Supabase response (NO any)
+// =======================
+// Normalizer
+// =======================
 function normalizeComment(row: SupabaseCommentRow): Comment {
   const profileRaw = Array.isArray(row.profiles)
     ? row.profiles[0]
@@ -45,8 +53,11 @@ function normalizeComment(row: SupabaseCommentRow): Comment {
   };
 }
 
+// =======================
+// Hook
+// =======================
 export function useComments(postId: string, initialComments: Comment[]) {
-  const supabase = createClient();
+  const supabase = getSupabaseBrowser();
 
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [isPending, startTransition] = useTransition();
@@ -54,30 +65,28 @@ export function useComments(postId: string, initialComments: Comment[]) {
   async function addComment(content: string) {
     const tempId = crypto.randomUUID();
 
+    const user = await getCurrentUserClient();
+
+    if (!user) return;
+
+    // =======================
+    // OPTIMISTIC COMMENT
+    // =======================
     const optimistic: Comment = {
       id: tempId,
       content,
       created_at: new Date().toISOString(),
-      user_id: "temp",
+      user_id: user.id,
       profiles: {
-        username: "You",
-        avatar_url: null,
+        username: user.user_metadata?.username ?? "You",
+        avatar_url: user.user_metadata?.avatar_url ?? null,
       },
+      _optimistic: true,
     };
 
     setComments((prev) => [optimistic, ...prev]);
 
     startTransition(async () => {
-      const { data: userData, error: userError } =
-        await supabase.auth.getUser();
-
-      const user = userData?.user;
-
-      if (userError || !user) {
-        setComments((prev) => prev.filter((c) => c.id !== tempId));
-        return;
-      }
-
       const { data, error } = await supabase
         .from("comments")
         .insert({
@@ -99,17 +108,23 @@ export function useComments(postId: string, initialComments: Comment[]) {
         )
         .single();
 
+      // =======================
+      // FAIL → rollback
+      // =======================
       if (error || !data) {
-        console.error(error);
-        setComments((prev) => prev.filter((c) => c.id !== tempId));
+        setComments((prev) =>
+          prev.filter((c) => !(c._optimistic && c.id === tempId)),
+        );
         return;
       }
 
-      // normalize safely (NO any)
       const normalized = normalizeComment(data as SupabaseCommentRow);
 
+      // =======================
+      // SUCCESS → replace optimistic
+      // =======================
       setComments((prev) =>
-        prev.map((c) => (c.id === tempId ? normalized : c)),
+        prev.map((c) => (c._optimistic && c.id === tempId ? normalized : c)),
       );
     });
   }

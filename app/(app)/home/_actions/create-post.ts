@@ -1,5 +1,6 @@
 "use server";
 
+import { getCurrentUserServer } from "@/lib/supabase/auth-server";
 import { createClient } from "@/lib/supabase/server";
 import { uploadPostImages } from "@/lib/upload-post-images";
 import { revalidatePath } from "next/cache";
@@ -35,9 +36,7 @@ export async function createPost(formData: FormData) {
    *
    * This ensures the post is tied to the logged-in user.
    */
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUserServer();
 
   /**
    * Prevent unauthenticated users

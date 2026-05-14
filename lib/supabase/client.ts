@@ -1,15 +1,19 @@
 import { createBrowserClient } from "@supabase/ssr";
 
 /**
- * Browser Supabase client (CLIENT-SIDE ONLY)
- * Use this inside:
- * - React hooks
- * - Client components
- * - Event handlers
+ * Singleton Supabase browser client
+ * Used everywhere on the CLIENT side only
  */
-export function createClient() {
-  return createBrowserClient(
+
+let supabaseInstance: ReturnType<typeof createBrowserClient> | null = null;
+
+export function getSupabaseBrowser() {
+  if (supabaseInstance) return supabaseInstance;
+
+  supabaseInstance = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   );
+
+  return supabaseInstance;
 }

@@ -1,28 +1,23 @@
 import Drawer from "@/components/ui/drawer";
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
+import { getCurrentUserServer } from "@/lib/supabase/auth-server";
 import React from "react";
+import { redirect } from "next/navigation";
 
 export default async function FeedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
+  const user = await getCurrentUserServer();
 
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error || !user) {
+  if (!user) {
     redirect("/login");
   }
 
   const safeUser = {
     id: user.id,
     username: user.user_metadata?.username ?? "no username",
-    avatar_url: user.user_metadata?.avatar_url,
+    avatar_url: user.user_metadata?.avatar_url ?? null,
   };
 
   return (

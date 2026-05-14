@@ -1,20 +1,16 @@
 import { getPostById } from "@/lib/queries/posts";
-import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import PostPageClient from "./_components/post-page-client";
+import { getCurrentUserServer } from "@/lib/supabase/auth-server";
 
 type Props = {
   params: Promise<{ id: string }>;
 };
 
 export default async function PostPage({ params }: Props) {
-  const supabase = await createClient();
-
   const { id } = await params;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUserServer();
 
   const post = await getPostById(id);
 

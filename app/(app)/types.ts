@@ -1,7 +1,3 @@
-// =======================
-// CORE POST TYPES
-// =======================
-
 export type PostImage = {
   id: string;
   image_url: string;
@@ -22,15 +18,8 @@ export type PostComment = {
   content: string;
   created_at: string;
   user_id: string;
-  profiles: {
-    username: string;
-    avatar_url: string | null;
-  } | null;
+  profiles: PostProfile | null;
 };
-
-// =======================
-// MAIN POST MODEL
-// =======================
 
 export type Post = {
   id: string;
